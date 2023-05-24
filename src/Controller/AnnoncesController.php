@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Annonces;
+use App\Entity\Categories;
 use App\Repository\AnnoncesRepository;
 use App\Repository\CategoriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -66,10 +67,22 @@ class AnnoncesController extends AbstractController
         
         $idCategorie = $content['idCategorie'] ?? -1;
 
-        if ($idCategorie != 1){
+        if ($idCategorie != 3){
             $annonce->setModele(null);
             $annonce->setMarque(null);
+        } else {
+            $modele = $content['modele'];
+            $testMarque = $this->findMarqueByModele($modele);
+            if ($testMarque === null) {
+                return new JsonResponse('Le modèle renseigné est introuvable dans la liste des modèles autorisés', JsonResponse::HTTP_BAD_REQUEST, [], true);
+            } else {
+                $marque = $testMarque[0];
+                $modeleExiste = $testMarque[1];
+                $annonce->setMarque($marque);
+                $annonce->setModele($modeleExiste);
+            }
         }
+
         $annonce->setCategories($categoriesRepository->find($idCategorie)); 
         $em->persist($annonce);
         $em->flush();
@@ -97,9 +110,15 @@ class AnnoncesController extends AbstractController
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
    }
 
-   //Fonction permettant de trouver la marque grâce au modèle
-    private function findMarqueByModele(string $modele): ?string
+    //Fonction permettant de trouver la marque grâce au modèle
+    private function findMarqueByModele(string $modele)
     {
+        // Convertir le texte en minuscules, supprimer les espaces en trop et remplacer les caractères spéciaux
+        $cherche  = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ò', 'ó', 'ô', 'õ', 'ö', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ',' ');
+	    $remplace = array('A', 'A', 'A', 'A', 'A', 'A', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'a', 'a', 'a', 'a', 'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y','');
+        $texte = strtolower(str_replace($cherche,$remplace, $modele));
+
+        // Définir la liste des marques et modèles de véhicules
         $marquesModeles = [
             'Audi' => [
                 'Cabriolet', 'Q2', 'Q3', 'Q5', 'Q7', 'Q8', 'R8', 'Rs3', 'Rs4', 'Rs5', 'Rs7',
@@ -115,16 +134,70 @@ class AnnoncesController extends AbstractController
                 'C3 Picasso', 'C4', 'C4 Picasso', 'C5', 'C6', 'C8', 'Ds3', 'Ds4', 'Ds5'
             ],
         ];
-
+        
+        // Parcourir la liste des marques et modèles
+        $correspondances = array();
         foreach ($marquesModeles as $marque => $modeles) {
             foreach ($modeles as $modeleExist) {
-                similar_text(strtolower($modele), strtolower($modeleExist), $similarity);
 
-                if ($similarity >= 80) {
-                    return $marque;
+                // Formater le modèle en enlevant les espaces, convertir en minuscules et remplacer les caractères spéciaux
+                $modeleFormatte = strtolower(str_replace($cherche, $remplace, $modeleExist));
+
+                // Vérifier si le modèle formaté est présent dans le texte saisi
+                if (strpos($texte, $modeleFormatte) !== false) {
+                    similar_text(strtolower($texte), strtolower($modeleExist), $similarity);
+                    array_push($correspondances, [$modeleExist, $marque, $similarity]);
                 }
             }
         }
-        return null;
+        if (empty($correspondances)) {
+            return null;
+        } else {
+            $valeurMax = -INF;
+            $bestCorrespondance = array();
+
+            foreach ($correspondances as $correspondance) {
+                if ($correspondance[2] > $valeurMax) {
+                    $valeurMax = $correspondance[2];
+                    $bestCorrespondance = array($correspondance);  // Réinitialiser le tableau avec la correspondance ayant la valeur maximale
+                }
+            }        
+            $bonneMarque = $bestCorrespondance[0][1];
+            $bonModele = $bestCorrespondance[0][0];
+            return [$bonneMarque, $bonModele];
+        }     
     }
+
+    //Créer une categorie
+    #[Route('/api/categories', name:"creer_categorie", methods: ['POST'])]
+    public function createCategorie(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ValidatorInterface $validator, Categories $categories): JsonResponse 
+    {
+
+        $categorie = $serializer->deserialize($request->getContent(), Categories::class, 'json');
+        $errors = $validator->validate($categorie);
+        
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $content = $request->toArray();
+        
+        
+        $nomCategorie = $content['nom'];
+        $categorie->setNom($nomCategorie);
+        $em->persist($categorie);
+        $em->flush();
+        //$jsonCategorie = $serializer->serialize($categorie, 'json', ['groups' => 'getAnnonces']);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+   }
+   //Récupérer toutes les categories
+   #[Route('/api/categories', name: 'liste_categories', methods: ['GET'])]
+   public function getListeCategories(CategoriesRepository $categoriesRepository, SerializerInterface $serializer): JsonResponse
+   {
+       $categoriesListe = $categoriesRepository->findAll();
+       $jsonCategoriesListe = $serializer->serialize($categoriesListe, 'json', ['groups' => 'getAnnonces']);
+       return new JsonResponse($jsonCategoriesListe, Response::HTTP_OK, [], true);
+   }
+
 }

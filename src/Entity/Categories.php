@@ -21,7 +21,7 @@ class Categories
     #[Groups(["getAnnonces"])]
     private ?string $nom = null;
 
-    #[ORM\OneToMany(mappedBy: 'categories', targetEntity: annonces::class)]
+    #[ORM\OneToMany(mappedBy: 'categories', targetEntity: Annonces::class)]
     private Collection $annonces;
 
     public function __construct()

@@ -1,0 +1,14 @@
+curl -X POST -H "Content-Type: application/json" -d '{"titre":"test 1 emploi", "contenu":"à voir si ça marche", "categorie":"2"}' http://localhost:4000/api/annonces
+curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"test 1 emploi\", \"contenu\":\"a voir si ca marche\", \"categories_id\":\"2\"}" http://localhost:4000/api/annonces
+
+{
+    "titre":"test 1 emploi",
+    "contenu":"à voir si ça marche",
+    "idCategorie": 2
+}
+
+curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"test 1 emploi\", \"contenu\":\"a voir si ca marche\", \"idCategorie\":2, \"modele\":null, \"marque\":null}" http://localhost:4000/api/annonces
+
+curl -X DELETE http://localhost:4000/api/annonces/2
+
+curl -X GET http://localhost:4000/api/annonces | sort
