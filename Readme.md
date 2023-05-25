@@ -38,7 +38,7 @@ Pour l'automobile, les marques et modèles disponibles seront :
 ```
 2. Installer les dépendances PHP : 
 ```
-composer install
+    composer install
 ```
 3. Configurer les variables d'environnement : 
 * configurez les valeurs appropriées dans le fichier .env.

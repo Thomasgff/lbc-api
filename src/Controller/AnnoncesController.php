@@ -38,17 +38,22 @@ class AnnoncesController extends AbstractController
             $jsonAnnonce = $serializer->serialize($annonce, 'json', ['groups' => 'getAnnonces']);
             return new JsonResponse($jsonAnnonce, Response::HTTP_OK, [], true);
         }
-        return new JsonResponse(null,Response::HTTP_NOT_FOUND);
+        return new JsonResponse("L'annonce pour cet id est introuvable",Response::HTTP_NOT_FOUND, [], true);
     }
 
     //Supprimer une annonce
     #[Route('/api/annonces/{id}', name: 'supprimer_annonce', methods: ['DELETE'])]
     public function deleteAnnonce(Annonces $annonce, EntityManagerInterface $em): JsonResponse 
     {
-        $em->remove($annonce);
-        $em->flush();
+        $annonce = $annoncesRepository->find($id);
+        if ($annonce) {
+            $em->remove($annonce);
+            $em->flush();
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+            return new JsonResponse("L'annonce a bien été supprimée", Response::HTTP_OK, [], true);
+        } else {
+            return new JsonResponse("L'annonce pour cet id est introuvable",Response::HTTP_NOT_FOUND, [], true);
+        }
     }
 
     //Créer une annonce
