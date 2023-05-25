@@ -2,24 +2,24 @@ Mon Projet
 ===
 API permettant de créer, modifier, supprimer et récupérer des annonces.
 Les annonces sont liées à une catégorie:
-    - emploi
-    - immobilier
-    - auto
+* emploi
+* immobilier
+* auto
 Une annonce doit posséder :
-    - un titre
-    - un contenu
+* un titre
+* un contenu
 Ainsi que deux champs dédiés uniquement à la catégorie Automobile :
-    - Marque du véhicule
-    - Modèle du véhicul
+* Marque du véhicule
+* Modèle du véhicul
 
 Les marques et les modèles de véhicules sont limités, tout véhicule non trouvé parmi cette liste sera refusé par l'API. 
 Pour l'automobile, les marques et modèles disponibles seront :
-    - Audi
-        ○ Cabriolet, Q2, Q3, Q5, Q7, Q8, R8, Rs3, Rs4, Rs5, Rs7, S3, S4, S4 Avant,S4 Cabriolet, S5, S7, S8, SQ5, SQ7, Tt, Tts, V8
-    - BMW
-        ○ M3, M4, M5, M535, M6, M635, Serie 1, Serie 2, Serie 3, Serie 4, Serie 5, Serie 6, Serie 7, Serie 8
-    - Citroen
-        ○ C1, C15, C2, C25, C25D, C25E, C25TD, C3, C3 Aircross, C3 Picasso, C4, C4 Picasso, C5, C6, C8, Ds3, Ds4, Ds5
+* Audi
+    - Cabriolet, Q2, Q3, Q5, Q7, Q8, R8, Rs3, Rs4, Rs5, Rs7, S3, S4, S4 Avant,S4 Cabriolet, S5, S7, S8, SQ5, SQ7, Tt, Tts, V8
+* BMW
+    - M3, M4, M5, M535, M6, M635, Serie 1, Serie 2, Serie 3, Serie 4, Serie 5, Serie 6, Serie 7, Serie 8
+* Citroen
+    - C1, C15, C2, C25, C25D, C25E, C25TD, C3, C3 Aircross, C3 Picasso, C4, C4 Picasso, C5, C6, C8, Ds3, Ds4, Ds5
 
 ## Table des matières
 ----------------------------------------------------------------
@@ -40,7 +40,8 @@ Pour l'automobile, les marques et modèles disponibles seront :
 ```
 composer install
 ```
-3. Configurer les variables d'environnement : configurez les valeurs appropriées dans le fichier .env.
+3. Configurer les variables d'environnement : 
+* configurez les valeurs appropriées dans le fichier .env.
 4. Créer les images et conteneurs dans Docker:
 ```
     docker compose build
@@ -54,7 +55,7 @@ RAPPEL: Docker doit être démarré sur la machine afin de pouvoir lancer ces co
     php bin/console doctrine:migrations:migrate
 ```
 6. Créer les catégories (important de respecter l'ordre pour les créations de catégories)
-    - ouvrir une invite de commande widows (pas powershell)
+* ouvrir une invite de commande windows (pas powershell)
 ```
     curl -X POST -H "Content-Type: application/json" -d "{\"nom\":\"emploi\"}" http://localhost:4000/api/categories
     curl -X POST -H "Content-Type: application/json" -d "{\"nom\":\"immobilier\"}" http://localhost:4000/api/categories
@@ -80,11 +81,11 @@ RAPPEL: Docker doit être démarré sur la machine afin de pouvoir lancer ces co
     curl -X GET http://localhost:4000/api/annonces/{id}
 ```
 3. Créer une annonce:
-    - catégorie 1 (emploi) ou 2 (immo):
+* catégorie 1 (emploi) ou 2 (immo):
 ```
     curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"<renseigner le titre>\", \"contenu\":\"<renseigner le contenu>\", \"idCategorie\":<renseigner 1 pour emploi ou 2 pour immo>}" http://localhost:4000/api/annonces
 ```
-    - catégorie 3 (automobile):
+* catégorie 3 (automobile):
 ```
     curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"<renseigner le titre>\", \"contenu\":\"<renseigner le contenu>\", \"idCategorie\":3, \"modele\":\"<renseigner le modele de la voiture, la marque n'est pas necessaire>\"}" http://localhost:4000/api/annonces
 ```
@@ -116,58 +117,13 @@ RAPPEL: Docker doit être démarré sur la machine afin de pouvoir lancer ces co
     curl -X DELETE http://localhost:4000/api/annonces/3
 ```
 
-
-
-
-
-
-
-
-{
-    "titre":"test 1 emploi",
-    "contenu":"à voir si ça marche",
-    "idCategorie": 2
-}
-
-curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"test 1 emploi\", \"contenu\":\"a voir si ca marche\", \"idCategorie\":2, \"modele\":null, \"marque\":null}" http://localhost:4000/api/annonces
-curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"test avec accents\", \"contenu\":\"a voir si ça marche\", \"idCategorie\":3, \"modele\":\"bmw série 5\", \"marque\":null}" http://localhost:4000/api/annonces
-
-curl -X DELETE http://localhost:4000/api/annonces/2
-
-curl -X GET http://localhost:4000/api/annonces
-
-curl -X PUT -H "Content-Type: application/json" -d "{\"idCategorie\":1}" http://localhost:4000/api/annonces/7
-
-
-
-Tests:
-
-{
-    "titre":"test auto sans modèle",
-    "contenu":"ça va bloquer? j'espère que si, si tu vois ce message c'est que non :(",
-    "idCategorie": 3
-}
-
-
-{
-    "titre":"test emploi sans modèle",
-    "contenu":"ça devrait passer",
-    "idCategorie": 1
-}
-
-curl -X PUT -H "Content-Type: application/json" -d "{\"titre\":\"l'emploi est une voiture maintenant\", \"contenu\":\"on va modifier l'annonce 7 et la passer dans la catégorie auto mais sans ajouter de modele...\", \"idCategorie\": 3}" http://localhost:4000/api/annonces/7
-Postman:
-{
-    "titre":"l'emploi est une voiture maintenant",
-    "contenu":"on va modifier l'annonce 7 et la passer dans la catégorie auto mais sans ajouter de modele...",
-    "idCategorie": 3
-}
-
-
-curl -X PUT -H "Content-Type: application/json" -d "{\"idCategorie\":1}" http://localhost:4000/api/annonces/7
-{
-    "titre":"l'emploi est une citroën maintenant",
-    "contenu":"on va modifier l'annonce 7 et la passer dans la catégorie auto avec un modèle cette fois",
-    "idCategorie": 3,
-    "modele": "CrossBack ds 3"
-}
+## Tests
+----------------------------------------------------------------
+* Tentative de création d'une annonce auto sans renseigner le modèle
+```
+    curl -X POST -H "Content-Type: application/json" -d "{\"titre\":\"test auto sans modele\", \"contenu\":\"ca va bloquer? j'espere que si, si tu vois ce message c'est que non :(\", \"idCategorie\":3}" http://localhost:4000/api/annonces
+```
+* Tentative de modification de la catégorie d'une annonce pour la passer en auto mais sans renseigner le modèle
+```
+    curl -X PUT -H "Content-Type: application/json" -d "{\"titre\":\"l'emploi est une voiture maintenant\", \"contenu\":\"on va modifier l'annonce 7 et la passer dans la categorie auto mais sans ajouter de modele...\", \"idCategorie\": 3}" http://localhost:4000/api/annonces/2
+```

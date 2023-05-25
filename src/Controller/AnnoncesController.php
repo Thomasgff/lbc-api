@@ -83,7 +83,7 @@ class AnnoncesController extends AbstractController
                     $annonce->setModele($modeleExiste);
                 }
             } else {
-                    return new JsonResponse('Un modèle de voiture doit absolument être renseigné pour la catégorie voiture', JsonResponse::HTTP_BAD_REQUEST, [], true);
+                    return new JsonResponse('Un modèle de voiture doit absolument être renseigné pour la catégorie automobile', JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
         }
 
