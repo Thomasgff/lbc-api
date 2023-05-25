@@ -110,7 +110,7 @@ RAPPEL: Docker doit être démarré sur la machine afin de pouvoir lancer ces co
 ```
 3. Modifier une annonce:
 ```
-    curl -X PUT -H "Content-Type: application/json" -d "{\"titre\":\"nouveau titre>\"}" http://localhost:4000/api/annonces/3
+    curl -X PUT -H "Content-Type: application/json" -d "{\"titre\":\"nouveau titre\"}" http://localhost:4000/api/annonces/3
 ```
 4. Supprimer une annonce:
 ```

@@ -43,7 +43,7 @@ class AnnoncesController extends AbstractController
 
     //Supprimer une annonce
     #[Route('/api/annonces/{id}', name: 'supprimer_annonce', methods: ['DELETE'])]
-    public function deleteAnnonce(Annonces $annonce, EntityManagerInterface $em): JsonResponse 
+    public function deleteAnnonce(int $id, AnnoncesRepository $annoncesRepository, EntityManagerInterface $em): JsonResponse 
     {
         $annonce = $annoncesRepository->find($id);
         if ($annonce) {
