@@ -1,6 +1,6 @@
 FROM php:8.1.19-fpm-alpine
 
-RUN apk add --no-cache composer php-ctype php-tokenizer php-xml php-session php-dom
+RUN apk add --no-cache composer php-ctype php-tokenizer php-xml php-session php-dom php-xmlwriter
 RUN docker-php-ext-install pdo_mysql mysqli
 
 COPY composer*.json ./

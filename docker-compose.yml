@@ -13,6 +13,8 @@ services:
       - database
     environment:
       - DATABASE_URL=mysql://user:user@database:3306/lbc_api?unix_socket=/var/run/mysqld/mysqld.sock
+      - PHP_DEFAULT_CHARSET=UTF-8
+      - PHP_MBSTRING_ENCODING=UTF-8
   database:
     container_name: mysql
     image: mysql

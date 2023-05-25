@@ -71,15 +71,19 @@ class AnnoncesController extends AbstractController
             $annonce->setModele(null);
             $annonce->setMarque(null);
         } else {
-            $modele = $content['modele'];
-            $testMarque = $this->findMarqueByModele($modele);
-            if ($testMarque === null) {
-                return new JsonResponse('Le modèle renseigné est introuvable dans la liste des modèles autorisés', JsonResponse::HTTP_BAD_REQUEST, [], true);
+            if (isset($content['modele'])) {
+                $modele = $content['modele'];
+                $testMarque = $this->findMarqueByModele($modele);
+                if ($testMarque === null) {
+                    return new JsonResponse('Le modèle renseigné est introuvable dans la liste des modèles autorisés', JsonResponse::HTTP_BAD_REQUEST, [], true);
+                } else {
+                    $marque = $testMarque[0];
+                    $modeleExiste = $testMarque[1];
+                    $annonce->setMarque($marque);
+                    $annonce->setModele($modeleExiste);
+                }
             } else {
-                $marque = $testMarque[0];
-                $modeleExiste = $testMarque[1];
-                $annonce->setMarque($marque);
-                $annonce->setModele($modeleExiste);
+                    return new JsonResponse('Un modèle de voiture doit absolument être renseigné pour la catégorie voiture', JsonResponse::HTTP_BAD_REQUEST, [], true);
             }
         }
 
@@ -104,7 +108,25 @@ class AnnoncesController extends AbstractController
         $content = $request->toArray();
         $idCategorie = $content['idCategorie'] ?? -1;
         $updatedAnnonce->setCategories($categoriesRepository->find($idCategorie));
-        
+        if ($idCategorie != 3){
+            $updatedAnnonce->setModele(null);
+            $updatedAnnonce->setMarque(null);
+        } else {
+            if (isset($content['modele'])) {
+                $modele = $content['modele'];
+                $testMarque = $this->findMarqueByModele($modele);
+                if ($testMarque === null) {
+                    return new JsonResponse('Le modèle renseigné est introuvable dans la liste des modèles autorisés', JsonResponse::HTTP_BAD_REQUEST, [], true);
+                } else {
+                    $marque = $testMarque[0];
+                    $modeleExiste = $testMarque[1];
+                    $updatedAnnonce->setMarque($marque);
+                    $updatedAnnonce->setModele($modeleExiste);
+                } 
+            } else {
+                    return new JsonResponse('Un modèle de voiture doit absolument être renseigné pour la catégorie voiture', JsonResponse::HTTP_BAD_REQUEST, [], true);
+            }
+        }
         $em->persist($updatedAnnonce);
         $em->flush();
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
