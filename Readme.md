@@ -35,6 +35,7 @@ Pour l'automobile, les marques et modèles disponibles seront :
 1. Cloner le dépôt : 
 ```
     git clone https://github.com/Thomasgff/lbc-api
+    cd lbc-api
 ```
 2. Installer les dépendances PHP : 
 ```
